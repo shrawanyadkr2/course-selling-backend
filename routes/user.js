@@ -38,7 +38,7 @@ userRouter.post('/signin', function (req, res) {
 
     const { email, password } = req.body;
 
-    const user = userModel.find({
+    const user = userModel.findOne({
         email: email,
         password: password
     })
