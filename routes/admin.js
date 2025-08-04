@@ -132,7 +132,7 @@ adminRouter.put("/course", adminMiddleware, async function (req, res) {
 });
 
 // Get all courses created by this admin
-adminRouter.post("/course/bulk", adminMiddleware, async function (req, res) {
+adminRouter.get("/course/bulk", adminMiddleware, async function (req, res) {
     const adminId = req.userId;
     try {
         const courses = await courseModel.find({

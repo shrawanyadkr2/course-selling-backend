@@ -64,9 +64,17 @@ userRouter.post('/signin', async function (req, res) {
 
 })
 
-userRouter.get('/purchases', function (req, res) {
+userRouter.get('/purchases', usermiddleware, async function (req, res) {
+
+    const userid = req.userId;
+
+    const purchases = await purchaseModel.find({
+        userId: userid
+    })
+
+    
     res.json({
-        msg: "you purchased that courses"
+        purchases: purchases
     })
 })
 
