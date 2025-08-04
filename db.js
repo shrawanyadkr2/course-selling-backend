@@ -49,10 +49,10 @@ const courseModel = mongoose.model("course",courseSchema);
 const purchaseModel = mongoose.model("purchase",purchaseSchema);
 
 
-module.export = {
+module.exports = {
     userModel,
     adminModel,
     courseModel,
     purchaseModel
 }
-
+ 

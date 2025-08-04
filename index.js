@@ -6,9 +6,11 @@ const { courseRouter } = require("./routes/course");
 const { adminRouter } = require("./routes/admin");
 const { mongo, default: mongoose } = require('mongoose');
 
-app.use("api/v1/user", userRouter);
-app.use("api/v1/course", courseRouter);
-app.use("api/v1/admin", adminRouter);
+app.use(express.json())
+
+app.use("/api/v1/user", userRouter);
+app.use("/api/v1/course", courseRouter); 
+app.use("/api/v1/admin", adminRouter);
 
 async function main() {
     await mongoose.connect("mongodb+srv://admin:ftc5w1ttoyEOAWDV@cluster0.uyjza.mongodb.net/coursera-app");
