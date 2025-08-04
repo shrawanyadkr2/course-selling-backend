@@ -4,6 +4,7 @@ const { adminModel, userModel, courseModel } = require("../db");
 const jwt = require("jsonwebtoken");
 const { JWT_ADMIN_SECRET } = require("../config");
 const { userMiddleware } = require("../middleware/user");
+const { adminMiddleware } = require("../middleware/admin");
 
 
 const adminRouter = Router();
@@ -61,7 +62,7 @@ adminRouter.post("/course", userMiddleware, async function (req, res) {
 
     const adminId = req.userId;
 
-    const { title, description, price, imageUrl,  } = req.body;
+    const { title, description, price, imageUrl  } = req.body;
 
     const course = await courseModel.create({
         title: title,
@@ -81,16 +82,43 @@ adminRouter.post("/course", userMiddleware, async function (req, res) {
 
 })
 
-adminRouter.put("/course", function (req, res) {
-    res.json({
-        msg: "generating new course"
+adminRouter.put("/course",adminMiddleware,async function (req, res) {
+
+     const adminId = req.userId;
+
+    const { title, description, price, imageUrl, courseId } = req.body;
+
+    const course = await courseModel.updateOne({
+        _id : courseId,
+        creatorId:adminId
+    },{
+
+        title: title,
+        description: description,
+        price: price,
+        imageUrl: imageUrl,
+        // creatorId: adminId
+
     })
+
+    res.json({
+        msg: "course updated",
+        courseId : course._id
+    })
+   
 })
 
-adminRouter.post("/course/bulk", function (req, res) {
+adminRouter.post("/course/bulk", adminMiddleware,async function (req, res) {
+    const adminId = req.userId;
+    const courses =await courseModel.find({
+        creatorId : adminId
+    });
+
     res.json({
-        msg: "course bulk end point"
+        msg:"all couse of this creator is here baby ",
+        courses
     })
+ 
 })
 
 
