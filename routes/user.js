@@ -7,8 +7,12 @@ const { Router } = require('express');
 const { userModel } = require("../db");
 const userRouter = Router();
 
+const jwt = require("jsonwebtoken");
+const JWT_SECRET_PASSWORD = "shrawan@875767";
 
-userRouter.post('/signup',async function (req, res) {
+
+
+userRouter.post('/signup', async function (req, res) {
 
     const { email, password, firstName, lastName } = req.body;
 
@@ -29,9 +33,32 @@ userRouter.post('/signup',async function (req, res) {
 })
 
 userRouter.post('/signin', function (req, res) {
-    res.json({
-        msg: "you are singned in"
+
+    const { email, password } = req.body;
+
+    const user = userModel.find({
+        email: email,
+        password: password
     })
+
+    if (user) {
+        const token = jwt.sign({
+            id: user._id
+        }, JWT_SECRET_PASSWORD);
+        // either do the cookies logic here
+
+        res.json({
+            token: token
+        })
+    }
+    else {
+
+        res.status(403).json({
+            msg: "incorrect credential"
+        })
+
+    }
+
 })
 
 userRouter.get('/purchases', function (req, res) {
