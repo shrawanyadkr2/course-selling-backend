@@ -8,7 +8,8 @@ const { userModel } = require("../db");
 const userRouter = Router();
 
 const jwt = require("jsonwebtoken");
-const JWT_SECRET_PASSWORD = "shrawan@875767";
+
+const { JWT_USER_SECRET } = require("../config")
 
 
 
@@ -46,7 +47,7 @@ userRouter.post('/signin', function (req, res) {
     if (user) {
         const token = jwt.sign({
             id: user._id
-        }, JWT_SECRET_PASSWORD);
+        }, JWT_USER_SECRET);
         // either do the cookies logic here
 
         res.json({

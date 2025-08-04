@@ -2,7 +2,7 @@ const { Router } = require("express");
 
 const { adminModel, userModel } = require("../db");
 const jwt = require("jsonwebtoken");
-const JWT_SECRET_PASSWORD = "5674admin";
+const { JWT_ADMIN_SECRET } = require("../config");
 
 
 const adminRouter = Router();
@@ -41,15 +41,15 @@ adminRouter.post("/signin", function (req, res) {
     if (admin) {
         const token = jwt.sign({
             id: admin._id
-        }, JWT_SECRET_PASSWORD);
+        }, JWT_ADMIN_SECRET);
         res.json({
             msg: "admin is singned in successfully"
         })
 
     }
-    else{
+    else {
         res.status(403).json({
-            msg:"incorrect credential"
+            msg: "incorrect credential"
         })
     }
 
