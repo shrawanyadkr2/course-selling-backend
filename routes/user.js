@@ -33,13 +33,13 @@ userRouter.post('/signup', async function (req, res) {
     })
 })
 
-userRouter.post('/signin', function (req, res) {
+userRouter.post('/signin', async function (req, res) {
 
     // Todo: ideally the password is hashed so we can't compare the DB password and the user provided password diretly in future 
 
     const { email, password } = req.body;
 
-    const user = userModel.findOne({
+    const user = await userModel.findOne({
         email: email,
         password: password
     })

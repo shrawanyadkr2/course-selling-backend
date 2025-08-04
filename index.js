@@ -9,6 +9,8 @@ const { userRouter } = require("./routes/user");
 const { courseRouter } = require("./routes/course");
 const { adminRouter } = require("./routes/admin");
 const { mongo, default: mongoose } = require('mongoose');
+const mongoose = require('mongoose');
+
 
 app.use(express.json())
 
