@@ -13,7 +13,7 @@ app.use("/api/v1/course", courseRouter);
 app.use("/api/v1/admin", adminRouter);
 
 async function main() {
-    await mongoose.connect("mongodb+srv://admin:ftc5w1ttoyEOAWDV@cluster0.uyjza.mongodb.net/coursera-app");
+    await mongoose.connect("");
 
     app.listen(3000);
 
