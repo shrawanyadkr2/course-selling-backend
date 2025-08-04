@@ -8,7 +8,7 @@ const app = express();
 const { userRouter } = require("./routes/user");
 const { courseRouter } = require("./routes/course");
 const { adminRouter } = require("./routes/admin");
-const { mongo, default: mongoose } = require('mongoose');
+// const { mongo, default: mongoose } = require('mongoose');
 const mongoose = require('mongoose');
 
 
