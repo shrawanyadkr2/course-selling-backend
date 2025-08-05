@@ -1,155 +1,109 @@
 const { Router } = require("express");
-
-const { adminModel, userModel, courseModel } = require("../db");
+const adminRouter = Router();
+const { adminModel, courseModel } = require("../db");
 const jwt = require("jsonwebtoken");
-const { JWT_ADMIN_SECRET } = require("../config");
-const { userMiddleware } = require("../middleware/user");
+// brcypt, zod, jsonwebtoken
+const  { JWT_ADMIN_PASSWORD } = require("../config");
 const { adminMiddleware } = require("../middleware/admin");
 
-const adminRouter = Router();
 
-// Admin signup
-adminRouter.post("/signup", async function (req, res) {
-    // TODO: Add zod validation
-    // TODO: Hash or bcrypt the password so that plain text password is not stored in the db
-    // TODO: Add a try-catch block
+adminRouter.post("/signup", async function(req, res) {
+    const { email, password, firstName, lastName } = req.body; // TODO: adding zod validation
+    // TODO: hash the password so plaintext pw is not stored in the DB
 
-    const { email, password, firstName, lastName } = req.body;
+    // TODO: Put inside a try catch block
+    await adminModel.create({
+        email: email,
+        password: password,
+        firstName: firstName, 
+        lastName: lastName
+    })
+    
+    res.json({
+        message: "Signup succeeded"
+    })
+})
 
-    try {
-        await adminModel.create({
-            email: email,
-            password: password,
-            firstName: firstName,
-            lastName: lastName
-        });
+adminRouter.post("/signin", async function(req, res) {
+    const { email, password } = req.body;
+
+    // TODO: ideally password should be hashed, and hence you cant compare the user provided password and the database password
+    const admin = await adminModel.findOne({
+        email: email,
+        password: password
+    });
+
+    if (admin) {
+        const token = jwt.sign({
+            id: admin._id
+        }, JWT_ADMIN_PASSWORD);
+
+        // Do cookie logic
 
         res.json({
-            msg: "admin is signed up successfully"
-        });
-    } catch (err) {
-        res.status(500).json({
-            msg: "Error signing up admin",
-            error: err.message
-        });
+            token: token
+        })
+    } else {
+        res.status(403).json({
+            message: "Incorrect credentials"
+        })
     }
-});
+})
 
-// Admin signin
-adminRouter.post("/signin", async function (req, res) {
-    const { email, password } = req.body;
-
-    try {
-        const admin = await adminModel.findOne({
-            email: email,
-            password: password
-        });
-
-        if (admin) {
-            const token = jwt.sign(
-                { id: admin._id },
-                JWT_ADMIN_SECRET
-            );
-            res.json({
-                msg: "admin is signed in successfully",
-                token
-            });
-        } else {
-            res.status(403).json({
-                msg: "incorrect credential"
-            });
-        }
-    } catch (err) {
-        res.status(500).json({
-            msg: "Error signing in admin",
-            error: err.message
-        });
-    }
-});
-
-// Create course (should use adminMiddleware, not userMiddleware)
-adminRouter.post("/course", adminMiddleware, async function (req, res) {
+adminRouter.post("/course", adminMiddleware, async function(req, res) {
     const adminId = req.userId;
-    const { title, description, price, imageUrl } = req.body;
 
-    try {
-        const course = await courseModel.create({
-            title: title,
-            description: description,
-            price: price,
-            imageUrl: imageUrl,
-            creatorId: adminId
-        });
+    const { title, description, imageUrl, price } = req.body;
 
-        res.json({
-            msg: "course created",
-            courseId: course._id
-        });
-    } catch (err) {
-        res.status(500).json({
-            msg: "Error creating course",
-            error: err.message
-        });
-    }
-});
+    // creating a web3 saas in 6 hours
+    const course = await courseModel.create({
+        title: title, 
+        description: description, 
+        imageUrl: imageUrl, 
+        price: price, 
+        creatorId: adminId
+    })
 
-// Update course
-adminRouter.put("/course", adminMiddleware, async function (req, res) {
+    res.json({
+        message: "Course created",
+        courseId: course._id
+    })
+})
+
+adminRouter.put("/course", adminMiddleware, async function(req, res) {
     const adminId = req.userId;
-    const { title, description, price, imageUrl, courseId } = req.body;
 
-    try {
-        const course = await courseModel.findOneAndUpdate(
-            {
-                _id: courseId,
-                creatorId: adminId
-            },
-            {
-                title: title,
-                description: description,
-                price: price,
-                imageUrl: imageUrl
-            },
-            { new: true }
-        );
+    const { title, description, imageUrl, price, courseId } = req.body;
 
-        if (!course) {
-            return res.status(404).json({
-                msg: "Course not found or not authorized"
-            });
-        }
+    // creating a web3 saas in 6 hours
+    const course = await courseModel.updateOne({
+        _id: courseId, 
+        creatorId: adminId 
+    }, {
+        title: title, 
+        description: description, 
+        imageUrl: imageUrl, 
+        price: price
+    })
 
-        res.json({
-            msg: "course updated",
-            courseId: course._id
-        });
-    } catch (err) {
-        res.status(500).json({
-            msg: "Error updating course",
-            error: err.message
-        });
-    }
-});
+    res.json({
+        message: "Course updated",
+        courseId: course._id
+    })
+})
 
-// Get all courses created by this admin
-adminRouter.get("/course/bulk", adminMiddleware, async function (req, res) {
+adminRouter.get("/course/bulk", adminMiddleware,async function(req, res) {
     const adminId = req.userId;
-    try {
-        const courses = await courseModel.find({
-            creatorId: adminId
-        });
 
-        res.json({
-            msg: "all courses of this creator",
-            courses
-        });
-    } catch (err) {
-        res.status(500).json({
-            msg: "Error fetching courses",
-            error: err.message
-        });
-    }
-});
+    const courses = await courseModel.find({
+        creatorId: adminId 
+    });
+
+    res.json({
+        message: "Course updated",
+        courses
+    })
+})
 
 module.exports = {
     adminRouter: adminRouter
